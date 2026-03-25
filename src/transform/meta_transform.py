@@ -69,7 +69,7 @@ def transform_meta_table(df: pd.DataFrame) -> pd.DataFrame:
 
     silver["mes"] = silver["mes_meta"].apply(_parse_month)
     silver["ano"] = silver["mes_meta"].apply(_parse_year)
-    silver["data_mm_yyyy"] = silver.apply(_build_month_reference, axis=1)
+    silver["mes_ano_meta"] = silver.apply(_build_month_reference, axis=1)
     silver["meta_valor"] = silver["meta"].apply(_parse_meta_value)
     silver["nome_mes"] = silver["mes"].apply(_build_month_name)
 
@@ -79,7 +79,7 @@ def transform_meta_table(df: pd.DataFrame) -> pd.DataFrame:
     silver["meta_valor"] = silver["meta_valor"].astype("Float64")
 
     ordered_columns = [
-        "data_mm_yyyy",
+        "mes_ano_meta",
         "meta_valor",
         "mes",
         "ano",
