@@ -126,6 +126,14 @@ def _ingest_bcb_rates(settings: Settings, logger: logging.Logger) -> None:
         )
         return
 
+    rows_original = len(df_rates)
+    df_rates = _complete_missing_quote_days(
+        df_rates=df_rates,
+        quote_dates=quote_dates,
+        currencies=target_currencies,
+    )
+    rows_completed = len(df_rates)
+
     output_file = write_parquet(
         df=df_rates,
         output_path=settings.data_bronze_path / "bcb_cotacoes",
@@ -139,6 +147,14 @@ def _ingest_bcb_rates(settings: Settings, logger: logging.Logger) -> None:
         stage="bronze",
         dataset="bcb_cotacoes",
         status="success",
+    )
+    _log(
+        logger,
+        logging.INFO,
+        f"RowsOriginal={rows_original} RowsCompleted={rows_completed}",
+        stage="bronze",
+        dataset="bcb_cotacoes",
+        status="metadata",
     )
 
 
@@ -339,3 +355,42 @@ def _last_day_of_month(year: int, month: int) -> date:
     if month == 12:
         return date(year, 12, 31)
     return date(year, month + 1, 1) - timedelta(days=1)
+
+
+def _complete_missing_quote_days(
+    df_rates: pd.DataFrame,
+    quote_dates: list[date],
+    currencies: list[str],
+) -> pd.DataFrame:
+    if df_rates.empty:
+        return df_rates
+
+    all_dates = pd.to_datetime(sorted(set(quote_dates)))
+    if all_dates.empty:
+        return df_rates
+
+    normalized = df_rates.copy()
+    normalized["data"] = pd.to_datetime(normalized["data"], errors="coerce")
+    normalized = normalized.dropna(subset=["data"]).copy()
+
+    if normalized.empty:
+        return normalized
+
+    normalized = normalized.sort_values(["moeda", "data"])
+    normalized = normalized.drop_duplicates(subset=["moeda", "data"], keep="last")
+
+    full_index = pd.MultiIndex.from_product(
+        [sorted(currencies), all_dates],
+        names=["moeda", "data"],
+    )
+
+    completed = normalized.set_index(["moeda", "data"]).reindex(full_index)
+    completed[["cotacao_compra", "cotacao_venda"]] = completed.groupby(level=0)[
+        ["cotacao_compra", "cotacao_venda"]
+    ].ffill()
+
+    completed = completed.dropna(subset=["cotacao_compra", "cotacao_venda"]) 
+    completed = completed.reset_index()
+    completed["data"] = completed["data"].dt.strftime("%Y-%m-%d")
+
+    return completed
