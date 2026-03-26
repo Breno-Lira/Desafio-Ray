@@ -7,6 +7,7 @@ import pandas as pd
 from src.config.settings import Settings
 from src.gold.postgres_loader import (
     create_pg_engine,
+    create_star_schema_indexes,
     create_star_schema_tables,
     drop_star_schema_tables,
     ensure_schema,
@@ -139,3 +140,5 @@ def _load_gold_to_postgres(settings: Settings, logger: logging.Logger, star: Gol
             rows_written=written,
             write_mode=mode,
         )
+
+    create_star_schema_indexes(engine=engine, schema=settings.postgres_schema)

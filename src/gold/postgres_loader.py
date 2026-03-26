@@ -100,6 +100,25 @@ def create_star_schema_tables(engine: Engine, schema: str) -> None:
             conn.execute(text(ddl))
 
 
+def create_star_schema_indexes(engine: Engine, schema: str) -> None:
+    index_statements = [
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_receber_id_cliente" ON "{schema}"."fato_conta_receber" ("id_cliente")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_receber_sk_categoria" ON "{schema}"."fato_conta_receber" ("sk_categoria")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_receber_sk_moeda" ON "{schema}"."fato_conta_receber" ("sk_moeda")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_receber_sk_data_pagamento" ON "{schema}"."fato_conta_receber" ("sk_data_pagamento")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_receber_sk_data_vencimento" ON "{schema}"."fato_conta_receber" ("sk_data_vencimento")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_pagar_sk_categoria" ON "{schema}"."fato_conta_pagar" ("sk_categoria")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_pagar_sk_moeda" ON "{schema}"."fato_conta_pagar" ("sk_moeda")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_pagar_sk_data_pagamento" ON "{schema}"."fato_conta_pagar" ("sk_data_pagamento")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_pagar_sk_data_vencimento" ON "{schema}"."fato_conta_pagar" ("sk_data_vencimento")',
+        f'CREATE INDEX IF NOT EXISTS "idx_fato_meta_sk_data_referencia" ON "{schema}"."fato_meta_mensal" ("sk_data_referencia")',
+    ]
+
+    with engine.begin() as conn:
+        for ddl in index_statements:
+            conn.execute(text(ddl))
+
+
 def reset_star_schema_tables(engine: Engine, schema: str) -> None:
     with engine.begin() as conn:
         conn.execute(
