@@ -18,10 +18,12 @@ class Settings:
     data_bronze_path: Path
     data_silver_path: Path
     data_gold_path: Path
+    data_ml_path: Path
     logs_path: Path
     bronze_format: str
     silver_format: str
     gold_format: str
+    ml_format: str
     bcb_currencies: list[str]
     bcb_target_countries: list[str]
     bcb_start_date: date | None
@@ -92,6 +94,7 @@ def get_settings() -> Settings:
     data_bronze_path = project_root / "data" / "bronze"
     data_silver_path = project_root / "data" / "silver"
     data_gold_path = project_root / "data" / "gold"
+    data_ml_path = project_root / "data" / "ml"
     logs_path = project_root / "logs"
 
     return Settings(
@@ -100,10 +103,12 @@ def get_settings() -> Settings:
         data_bronze_path=Path(os.getenv("DATA_BRONZE_PATH", data_bronze_path)),
         data_silver_path=Path(os.getenv("DATA_SILVER_PATH", data_silver_path)),
         data_gold_path=Path(os.getenv("DATA_GOLD_PATH", data_gold_path)),
+        data_ml_path=Path(os.getenv("DATA_ML_PATH", data_ml_path)),
         logs_path=Path(os.getenv("LOG_PATH", logs_path)),
         bronze_format=os.getenv("BRONZE_FORMAT", "parquet").lower(),
         silver_format=os.getenv("SILVER_FORMAT", "parquet").lower(),
         gold_format=os.getenv("GOLD_FORMAT", "parquet").lower(),
+        ml_format=os.getenv("ML_FORMAT", "parquet").lower(),
         bcb_currencies=_parse_currencies(os.getenv("BCB_CURRENCIES")),
         bcb_target_countries=_parse_countries(os.getenv("BCB_TARGET_COUNTRIES")),
         bcb_start_date=_parse_date(os.getenv("BCB_START_DATE")),

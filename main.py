@@ -5,6 +5,7 @@ import argparse
 from src.config.settings import get_settings
 from src.gold.gold_pipeline import run_gold_pipeline
 from src.ingestion.bronze_pipeline import run_bronze_ingestion
+from src.ml.ml_pipeline import run_ml_pipeline
 from src.transform.silver_pipeline import run_silver_pipeline
 from src.utils.logging_utils import setup_logging
 
@@ -13,7 +14,7 @@ def parse_args() -> argparse.Namespace:
 	parser = argparse.ArgumentParser(description="Desafio-Ray pipeline runner")
 	parser.add_argument(
 		"--stage",
-		choices=["bronze", "silver", "gold", "all"],
+		choices=["bronze", "silver", "gold", "ml", "all"],
 		default="all",
 		help="Define which layer to execute",
 	)
@@ -43,6 +44,9 @@ def main() -> None:
 
 	if args.stage in {"gold", "all"}:
 		run_gold_pipeline(settings=settings, logger=logger)
+
+	if args.stage in {"ml", "all"}:
+		run_ml_pipeline(settings=settings, logger=logger)
 
 	logger.info(
 		"Pipeline finished",
