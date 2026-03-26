@@ -55,7 +55,9 @@ def transform_client_table(df: pd.DataFrame) -> pd.DataFrame:
     silver["pais_cliente"] = silver["pais_cliente"].apply(_normalize_country)
 
     parsed_dates = _parse_client_dates(silver["data_cadastro_cliente"])
-    silver["data_cadastro_cliente"] = parsed_dates.dt.strftime("%d/%m/%Y")
+    silver["data_cadastro_cliente"] = pd.to_datetime(parsed_dates)
+    silver["data_cadastro_cliente"] = silver["data_cadastro_cliente"].dt.date
+
 
     silver["moeda_pais"] = silver["pais_cliente"].map(CURRENCY_BY_COUNTRY)
 

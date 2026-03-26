@@ -18,8 +18,8 @@ def parse_args() -> argparse.Namespace:
 	)
 	parser.add_argument(
 		"--table",
-		default="metas",
-		help="Table name for Silver execution (current supported: metas)",
+		default="all",
+		help="Table name for Silver execution (supported: all, metas, categoria, cliente)",
 	)
 	return parser.parse_args()
 

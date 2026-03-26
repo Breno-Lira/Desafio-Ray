@@ -70,6 +70,8 @@ def transform_meta_table(df: pd.DataFrame) -> pd.DataFrame:
     silver["mes"] = silver["mes_meta"].apply(_parse_month)
     silver["ano"] = silver["mes_meta"].apply(_parse_year)
     silver["mes_ano_meta"] = silver.apply(_build_month_reference, axis=1)
+    silver["mes_ano_meta"] = pd.to_datetime(silver["mes_ano_meta"], errors="coerce")
+    silver["mes_ano_meta"] = silver["mes_ano_meta"].dt.date
     silver["meta_valor"] = silver["meta"].apply(_parse_meta_value)
     silver["nome_mes"] = silver["mes"].apply(_build_month_name)
 
@@ -139,7 +141,12 @@ def _build_month_reference(row: pd.Series) -> str | None:
     year = row.get("ano")
     if pd.isna(month) or pd.isna(year):
         return None
-    return f"{int(month):02d}-{int(year):04d}"
+    # Return a Timestamp for the first day of the month so the column
+    # uses a datetime dtype (compatible with client registration date).
+    try:
+        return pd.Timestamp(year=int(year), month=int(month), day=1)
+    except Exception:
+        return None
 
 
 def _build_month_name(month: object) -> str | None:

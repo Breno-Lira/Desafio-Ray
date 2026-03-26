@@ -16,7 +16,13 @@ def _log(logger: logging.Logger, level: int, message: str, **kwargs: object) -> 
 
 
 def run_silver_pipeline(settings: Settings, logger: logging.Logger, table_name: str | None = None) -> None:
-	table = (table_name or "metas").strip().lower()
+	table = (table_name or "all").strip().lower()
+
+	if table in {"all", "todas", "todos"}:
+		_run_metas_silver(settings=settings, logger=logger)
+		_run_categoria_silver(settings=settings, logger=logger)
+		_run_cliente_silver(settings=settings, logger=logger)
+		return
 
 	if table in {"metas", "meta"}:
 		_run_metas_silver(settings=settings, logger=logger)
