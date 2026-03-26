@@ -133,6 +133,8 @@ def _build_customer_features(silver: dict[str, pd.DataFrame]) -> pd.DataFrame:
         delay.groupby("id_cliente", dropna=True)
         .agg(
             media_dias_atraso=("dias_atraso", "mean"),
+            variancia_dias_atraso=("dias_atraso", "var"),
+            desvio_dias_atraso=("dias_atraso", "std"),
             taxa_pagamento_em_dia=("pago_em_dia", "mean"),
             taxa_pagamento_atrasado=("pago_com_atraso", "mean"),
         )
@@ -173,6 +175,14 @@ def _build_customer_features(silver: dict[str, pd.DataFrame]) -> pd.DataFrame:
         if col == "id_cliente":
             continue
         features[col] = features[col].fillna(0)
+
+    # Reduz efeito de cauda longa em variaveis monetarias.
+    features["valor_total_recebido_brl_log1p"] = np.log1p(
+        features["valor_total_recebido_brl"].clip(lower=0),
+    )
+    features["valor_medio_recebido_brl_log1p"] = np.log1p(
+        features["valor_medio_recebido_brl"].clip(lower=0),
+    )
 
     # Cria uma faixa categórica de valor para enriquecer o treino do clustering.
     features["faixa_valor_cliente"] = _build_value_band(
