@@ -269,9 +269,19 @@ def _run_conta_receber_silver(settings: Settings, logger: logging.Logger) -> Non
 		)
 		return
 
+	df_bcb: pd.DataFrame | None = None
+	bcb_file = settings.data_bronze_path / "bcb_cotacoes.parquet"
+	if bcb_file.exists():
+		df_bcb = _read_bronze_file(str(bcb_file))
+
+	df_cliente: pd.DataFrame | None = None
+	cliente_file = settings.data_silver_path / "cliente_silver.parquet"
+	if cliente_file.exists():
+		df_cliente = _read_bronze_file(str(cliente_file))
+
 	df_bronze = _read_bronze_file(bronze_file)
 	rows_before = len(df_bronze)
-	df_silver = transform_conta_receber_table(df_bronze)
+	df_silver = transform_conta_receber_table(df_bronze, df_bcb=df_bcb, df_cliente=df_cliente)
 	rows_after = len(df_silver)
 
 	output_file = write_parquet(
