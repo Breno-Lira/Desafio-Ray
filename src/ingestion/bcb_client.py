@@ -56,7 +56,7 @@ class BcbClient:
 
                 item = payload[0]
                 return {
-                    "moeda": item.get("moeda"),
+                    "moeda": currency,
                     "data": item.get("dataHoraCotacao", "")[:10],
                     "cotacao_compra": item.get("cotacaoCompra"),
                     "cotacao_venda": item.get("cotacaoVenda"),

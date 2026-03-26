@@ -6,6 +6,7 @@ from pathlib import Path
 from src.config.settings import Settings
 from src.ingestion.bcb_client import BcbClient, BcbClientConfig
 from src.ingestion.file_loader import list_raw_files, read_raw_file, write_parquet
+from src.transform.client_transform import CURRENCY_BY_COUNTRY
 
 
 def _log(logger: logging.Logger, level: int, message: str, **kwargs: object) -> None:
@@ -65,6 +66,28 @@ def run_bronze_ingestion(settings: Settings, logger: logging.Logger) -> None:
 
 
 def _ingest_bcb_rates(settings: Settings, logger: logging.Logger) -> None:
+    target_currencies = _get_target_currencies_from_countries(settings)
+
+    if not target_currencies:
+        _log(
+            logger,
+            logging.WARNING,
+            "No target currencies resolved from requested countries",
+            stage="bronze",
+            dataset="bcb_cotacoes",
+            status="skipped",
+        )
+        return
+
+    _log(
+        logger,
+        logging.INFO,
+        f"Using BCB currencies from countries={settings.bcb_target_countries}: {target_currencies}",
+        stage="bronze",
+        dataset="bcb_cotacoes",
+        status="metadata",
+    )
+
     client = BcbClient(
         BcbClientConfig(
             timeout_seconds=settings.bcb_timeout_seconds,
@@ -73,7 +96,7 @@ def _ingest_bcb_rates(settings: Settings, logger: logging.Logger) -> None:
     )
 
     df_rates = client.fetch_rates(
-        currencies=settings.bcb_currencies,
+        currencies=target_currencies,
         start_date=settings.bcb_start_date,
         end_date=settings.bcb_end_date,
     )
@@ -103,3 +126,12 @@ def _ingest_bcb_rates(settings: Settings, logger: logging.Logger) -> None:
         dataset="bcb_cotacoes",
         status="success",
     )
+
+
+def _get_target_currencies_from_countries(settings: Settings) -> list[str]:
+    currencies = {
+        CURRENCY_BY_COUNTRY[country]
+        for country in settings.bcb_target_countries
+        if country in CURRENCY_BY_COUNTRY and CURRENCY_BY_COUNTRY[country] != "BRL"
+    }
+    return sorted(currencies)

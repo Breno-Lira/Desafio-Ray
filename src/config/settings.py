@@ -21,6 +21,7 @@ class Settings:
     bronze_format: str
     silver_format: str
     bcb_currencies: list[str]
+    bcb_target_countries: list[str]
     bcb_start_date: date
     bcb_end_date: date
     bcb_timeout_seconds: int
@@ -38,6 +39,19 @@ def _parse_date(value: str | None, fallback: date) -> date:
 def _parse_currencies(value: str | None) -> list[str]:
     if not value:
         return ["USD", "EUR", "GBP", "ARS", "CAD"]
+    return [item.strip().upper() for item in value.split(",") if item.strip()]
+
+
+def _parse_countries(value: str | None) -> list[str]:
+    if not value:
+        return [
+            "PORTUGAL",
+            "FRANCA",
+            "ESTADOS UNIDOS",
+            "CANADA",
+            "ARGENTINA",
+            "REINO UNIDO",
+        ]
     return [item.strip().upper() for item in value.split(",") if item.strip()]
 
 
@@ -61,6 +75,7 @@ def get_settings() -> Settings:
         bronze_format=os.getenv("BRONZE_FORMAT", "parquet").lower(),
         silver_format=os.getenv("SILVER_FORMAT", "parquet").lower(),
         bcb_currencies=_parse_currencies(os.getenv("BCB_CURRENCIES")),
+        bcb_target_countries=_parse_countries(os.getenv("BCB_TARGET_COUNTRIES")),
         bcb_start_date=_parse_date(os.getenv("BCB_START_DATE"), default_start),
         bcb_end_date=_parse_date(os.getenv("BCB_END_DATE"), today),
         bcb_timeout_seconds=int(os.getenv("BCB_TIMEOUT_SECONDS", "20")),
