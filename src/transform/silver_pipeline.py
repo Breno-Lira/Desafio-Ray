@@ -9,6 +9,8 @@ from src.config.settings import Settings
 from src.ingestion.file_loader import write_parquet
 from src.transform.category_transform import transform_category_table
 from src.transform.meta_transform import transform_meta_table
+from src.transform.conta_pagar_transform import transform_conta_pagar_table
+from src.transform.conta_receber_transform import transform_conta_receber_table
 
 
 def _log(logger: logging.Logger, level: int, message: str, **kwargs: object) -> None:
@@ -22,6 +24,8 @@ def run_silver_pipeline(settings: Settings, logger: logging.Logger, table_name: 
 		_run_metas_silver(settings=settings, logger=logger)
 		_run_categoria_silver(settings=settings, logger=logger)
 		_run_cliente_silver(settings=settings, logger=logger)
+		_run_conta_pagar_silver(settings=settings, logger=logger)
+		_run_conta_receber_silver(settings=settings, logger=logger)
 		return
 
 	if table in {"metas", "meta"}:
@@ -36,7 +40,17 @@ def run_silver_pipeline(settings: Settings, logger: logging.Logger, table_name: 
 		_run_cliente_silver(settings=settings, logger=logger)
 		return
 
-	raise ValueError("Supported silver tables are: metas, categoria, cliente")
+	if table in {"conta_pagar", "contas_pagar", "pagar"}:
+		_run_conta_pagar_silver(settings=settings, logger=logger)
+		return
+
+	if table in {"conta_receber", "contas_receber", "receber"}:
+		_run_conta_receber_silver(settings=settings, logger=logger)
+		return
+
+	raise ValueError(
+		"Supported silver tables are: metas, categoria, cliente, conta_pagar, conta_receber, or 'all'"
+	)
 
 
 def _run_metas_silver(settings: Settings, logger: logging.Logger) -> None:
@@ -185,6 +199,109 @@ def _run_cliente_silver(settings: Settings, logger: logging.Logger) -> None:
 		),
 		stage="silver",
 		dataset="cliente",
+		status="metadata",
+	)
+
+
+def _run_conta_pagar_silver(settings: Settings, logger: logging.Logger) -> None:
+	bronze_file = _resolve_bronze_file(settings=settings, base_name="PS_Conta_Pagar")
+
+	if bronze_file is None:
+		_log(
+			logger,
+			logging.ERROR,
+			"Bronze file for conta_pagar not found",
+			stage="silver",
+			dataset="conta_pagar",
+			status="error",
+			error="Missing PS_Conta_Pagar.parquet/csv in data/bronze",
+		)
+		return
+
+	df_bronze = _read_bronze_file(bronze_file)
+	rows_before = len(df_bronze)
+	df_silver = transform_conta_pagar_table(df_bronze)
+	rows_after = len(df_silver)
+
+	output_file = write_parquet(
+		df=df_silver,
+		output_path=settings.data_silver_path / "conta_pagar_silver",
+		output_format=settings.silver_format,
+	)
+
+	paid_count = int(df_silver["status_conta"].astype(str).str.lower().eq("pago").sum())
+	open_count = int(df_silver["status_conta"].astype(str).str.lower().eq("em aberto").sum())
+
+	_log(
+		logger,
+		logging.INFO,
+		"Silver conta_pagar transformation completed",
+		stage="silver",
+		dataset="conta_pagar",
+		status="success",
+	)
+	_log(
+		logger,
+		logging.INFO,
+		(
+			f"RowsBefore={rows_before} RowsAfter={rows_after} "
+			f"Pago={paid_count} EmAberto={open_count} "
+			f"Output={output_file.name}"
+		),
+		stage="silver",
+		dataset="conta_pagar",
+		status="metadata",
+	)
+
+
+def _run_conta_receber_silver(settings: Settings, logger: logging.Logger) -> None:
+	bronze_file = _resolve_bronze_file(settings=settings, base_name="PS_Conta_Receber")
+
+	if bronze_file is None:
+		_log(
+			logger,
+			logging.ERROR,
+			"Bronze file for conta_receber not found",
+			stage="silver",
+			dataset="conta_receber",
+			status="error",
+			error="Missing PS_Conta_Receber.parquet/csv in data/bronze",
+		)
+		return
+
+	df_bronze = _read_bronze_file(bronze_file)
+	rows_before = len(df_bronze)
+	df_silver = transform_conta_receber_table(df_bronze)
+	rows_after = len(df_silver)
+
+	output_file = write_parquet(
+		df=df_silver,
+		output_path=settings.data_silver_path / "conta_receber_silver",
+		output_format=settings.silver_format,
+	)
+
+	status_series = df_silver["status_conta"].astype(str).str.strip().str.lower()
+	recebido_count = int(status_series.str.contains("recebido|pago", regex=True, na=False).sum())
+	em_aberto_count = int(status_series.str.contains("aberto|pendente", regex=True, na=False).sum())
+
+	_log(
+		logger,
+		logging.INFO,
+		"Silver conta_receber transformation completed",
+		stage="silver",
+		dataset="conta_receber",
+		status="success",
+	)
+	_log(
+		logger,
+		logging.INFO,
+		(
+			f"RowsBefore={rows_before} RowsAfter={rows_after} "
+			f"Recebido={recebido_count} EmAberto={em_aberto_count} "
+			f"Output={output_file.name}"
+		),
+		stage="silver",
+		dataset="conta_receber",
 		status="metadata",
 	)
 
