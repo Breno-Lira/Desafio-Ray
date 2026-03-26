@@ -5,7 +5,7 @@ from pathlib import Path
 
 from src.config.settings import Settings
 from src.ingestion.bcb_client import BcbClient, BcbClientConfig
-from src.ingestion.file_loader import list_raw_files, read_raw_file, write_bronze
+from src.ingestion.file_loader import list_raw_files, read_raw_file, write_parquet
 
 
 def _log(logger: logging.Logger, level: int, message: str, **kwargs: object) -> None:
@@ -31,7 +31,7 @@ def run_bronze_ingestion(settings: Settings, logger: logging.Logger) -> None:
         try:
             df = read_raw_file(file_path)
             target_base = settings.data_bronze_path / dataset_name
-            output_file = write_bronze(df, target_base, settings.bronze_format)
+            output_file = write_parquet(df, target_base, settings.bronze_format)
 
             _log(
                 logger,
@@ -89,7 +89,7 @@ def _ingest_bcb_rates(settings: Settings, logger: logging.Logger) -> None:
         )
         return
 
-    output_file = write_bronze(
+    output_file = write_parquet(
         df=df_rates,
         output_path=settings.data_bronze_path / "bcb_cotacoes",
         output_format=settings.bronze_format,

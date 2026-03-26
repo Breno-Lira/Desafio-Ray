@@ -4,8 +4,9 @@ import logging
 
 import pandas as pd
 
+from src.transform.client_transform import transform_client_table
 from src.config.settings import Settings
-from src.ingestion.file_loader import write_bronze
+from src.ingestion.file_loader import write_parquet
 from src.transform.category_transform import transform_category_table
 from src.transform.meta_transform import transform_meta_table
 
@@ -25,7 +26,11 @@ def run_silver_pipeline(settings: Settings, logger: logging.Logger, table_name: 
 		_run_categoria_silver(settings=settings, logger=logger)
 		return
 
-	raise ValueError("Supported silver tables are: metas, categoria")
+	if table in {"cliente", "clientes"}:
+		_run_cliente_silver(settings=settings, logger=logger)
+		return
+
+	raise ValueError("Supported silver tables are: metas, categoria, cliente")
 
 
 def _run_metas_silver(settings: Settings, logger: logging.Logger) -> None:
@@ -46,7 +51,7 @@ def _run_metas_silver(settings: Settings, logger: logging.Logger) -> None:
 	df_bronze = _read_bronze_file(bronze_file)
 	df_silver = transform_meta_table(df_bronze)
 
-	output_file = write_bronze(
+	output_file = write_parquet(
 		df=df_silver,
 		output_path=settings.data_silver_path / "meta_2025_silver",
 		output_format=settings.silver_format,
@@ -100,7 +105,7 @@ def _run_categoria_silver(settings: Settings, logger: logging.Logger) -> None:
 	df_silver = transform_category_table(df_bronze)
 	rows_after = len(df_silver)
 
-	output_file = write_bronze(
+	output_file = write_parquet(
 		df=df_silver,
 		output_path=settings.data_silver_path / "categoria_silver",
 		output_format=settings.silver_format,
@@ -122,6 +127,58 @@ def _run_categoria_silver(settings: Settings, logger: logging.Logger) -> None:
 		f"RowsBefore={rows_before} RowsAfter={rows_after} Removed={removed_records} Output={output_file.name}",
 		stage="silver",
 		dataset="categoria",
+		status="metadata",
+	)
+
+
+def _run_cliente_silver(settings: Settings, logger: logging.Logger) -> None:
+	bronze_file = _resolve_bronze_file(settings=settings, base_name="PS_Cliente")
+
+	if bronze_file is None:
+		_log(
+			logger,
+			logging.ERROR,
+			"Bronze file for cliente not found",
+			stage="silver",
+			dataset="cliente",
+			status="error",
+			error="Missing PS_Cliente.parquet/csv in data/bronze",
+		)
+		return
+
+	df_bronze = _read_bronze_file(bronze_file)
+	rows_before = len(df_bronze)
+	df_silver = transform_client_table(df_bronze)
+	rows_after = len(df_silver)
+
+	output_file = write_parquet(
+		df=df_silver,
+		output_path=settings.data_silver_path / "cliente_silver",
+		output_format=settings.silver_format,
+	)
+
+	missing_country = int(df_silver["pais_cliente"].isna().sum())
+	missing_currency = int(df_silver["moeda_pais"].isna().sum())
+	missing_date = int(df_silver["data_cadastro_cliente"].isna().sum())
+
+	_log(
+		logger,
+		logging.INFO,
+		"Silver cliente transformation completed",
+		stage="silver",
+		dataset="cliente",
+		status="success",
+	)
+	_log(
+		logger,
+		logging.INFO,
+		(
+			f"RowsBefore={rows_before} RowsAfter={rows_after} "
+			f"MissingCountry={missing_country} MissingCurrency={missing_currency} "
+			f"MissingDate={missing_date} Output={output_file.name}"
+		),
+		stage="silver",
+		dataset="cliente",
 		status="metadata",
 	)
 

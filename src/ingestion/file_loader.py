@@ -29,7 +29,7 @@ def read_raw_file(file_path: Path) -> pd.DataFrame:
     raise ValueError(f"Unsupported extension: {suffix}")
 
 
-def write_bronze(df: pd.DataFrame, output_path: Path, output_format: str) -> Path:
+def write_parquet(df: pd.DataFrame, output_path: Path, output_format: str) -> Path:
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     if output_format == "parquet":
