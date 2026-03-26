@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,16 +22,16 @@ class Settings:
     silver_format: str
     bcb_currencies: list[str]
     bcb_target_countries: list[str]
-    bcb_start_date: date
-    bcb_end_date: date
+    bcb_start_date: date | None
+    bcb_end_date: date | None
     bcb_timeout_seconds: int
     bcb_retry_attempts: int
 
 
 
-def _parse_date(value: str | None, fallback: date) -> date:
+def _parse_date(value: str | None) -> date | None:
     if not value:
-        return fallback
+        return None
     return date.fromisoformat(value)
 
 
@@ -58,8 +58,6 @@ def _parse_countries(value: str | None) -> list[str]:
 
 def get_settings() -> Settings:
     project_root = Path(__file__).resolve().parents[2]
-    today = date.today()
-    default_start = today - timedelta(days=7)
 
     data_raw_path = project_root / "data" / "raw"
     data_bronze_path = project_root / "data" / "bronze"
@@ -76,8 +74,8 @@ def get_settings() -> Settings:
         silver_format=os.getenv("SILVER_FORMAT", "parquet").lower(),
         bcb_currencies=_parse_currencies(os.getenv("BCB_CURRENCIES")),
         bcb_target_countries=_parse_countries(os.getenv("BCB_TARGET_COUNTRIES")),
-        bcb_start_date=_parse_date(os.getenv("BCB_START_DATE"), default_start),
-        bcb_end_date=_parse_date(os.getenv("BCB_END_DATE"), today),
+        bcb_start_date=_parse_date(os.getenv("BCB_START_DATE")),
+        bcb_end_date=_parse_date(os.getenv("BCB_END_DATE")),
         bcb_timeout_seconds=int(os.getenv("BCB_TIMEOUT_SECONDS", "20")),
         bcb_retry_attempts=int(os.getenv("BCB_RETRY_ATTEMPTS", "3")),
     )
