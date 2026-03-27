@@ -86,6 +86,17 @@ def _parse_countries(value: str | None) -> list[str]:
     return [item.strip().upper() for item in value.split(",") if item.strip()]
 
 
+def _resolve_path(value: str | None, default_path: Path, project_root: Path) -> Path:
+    if not value:
+        return default_path
+
+    candidate = Path(value)
+    if candidate.is_absolute():
+        return candidate
+
+    return (project_root / candidate).resolve()
+
+
 
 def get_settings() -> Settings:
     project_root = Path(__file__).resolve().parents[2]
@@ -99,12 +110,12 @@ def get_settings() -> Settings:
 
     return Settings(
         project_root=project_root,
-        data_raw_path=Path(os.getenv("DATA_RAW_PATH", data_raw_path)),
-        data_bronze_path=Path(os.getenv("DATA_BRONZE_PATH", data_bronze_path)),
-        data_silver_path=Path(os.getenv("DATA_SILVER_PATH", data_silver_path)),
-        data_gold_path=Path(os.getenv("DATA_GOLD_PATH", data_gold_path)),
-        data_ml_path=Path(os.getenv("DATA_ML_PATH", data_ml_path)),
-        logs_path=Path(os.getenv("LOG_PATH", logs_path)),
+        data_raw_path=_resolve_path(os.getenv("DATA_RAW_PATH"), data_raw_path, project_root),
+        data_bronze_path=_resolve_path(os.getenv("DATA_BRONZE_PATH"), data_bronze_path, project_root),
+        data_silver_path=_resolve_path(os.getenv("DATA_SILVER_PATH"), data_silver_path, project_root),
+        data_gold_path=_resolve_path(os.getenv("DATA_GOLD_PATH"), data_gold_path, project_root),
+        data_ml_path=_resolve_path(os.getenv("DATA_ML_PATH"), data_ml_path, project_root),
+        logs_path=_resolve_path(os.getenv("LOG_PATH"), logs_path, project_root),
         bronze_format=os.getenv("BRONZE_FORMAT", "parquet").lower(),
         silver_format=os.getenv("SILVER_FORMAT", "parquet").lower(),
         gold_format=os.getenv("GOLD_FORMAT", "parquet").lower(),

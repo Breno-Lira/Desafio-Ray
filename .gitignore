@@ -201,6 +201,12 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Airflow local state
+.airflow/
+
+# Docker local overrides
+docker-compose.override.yml
+
 # Marimo
 marimo/_static/
 marimo/_lsp/
