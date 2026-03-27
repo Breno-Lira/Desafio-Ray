@@ -1,0 +1,201 @@
+<svg width="100%" viewBox="0 0 680 1080" xmlns="http://www.w3.org/2000/svg" style="font-family: sans-serif; background: #ffffff;">
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arrow-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#7F77DD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <marker id="arrow-teal" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M2 1L8 5L2 9" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+</defs>
+
+<!-- TÍTULO -->
+<text x="340" y="28" text-anchor="middle" font-size="15" font-weight="500" fill="#2C2C2A">Pipeline de Engenharia de Dados — Arquitetura Medalhão</text>
+
+<!-- ══ FONTES ══ -->
+<rect x="30" y="44" width="620" height="108" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="64" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Fontes de dados</text>
+
+<rect x="44" y="72" width="138" height="66" rx="7" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="113" y="94" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">API Banco Central</text>
+<text x="113" y="109" text-anchor="middle" font-size="12" fill="#534AB7">PTAX — cotações</text>
+<text x="113" y="124" text-anchor="middle" font-size="12" fill="#534AB7">USD · EUR · GBP · ARS</text>
+
+<rect x="196" y="72" width="110" height="66" rx="7" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="251" y="94" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">PS_Cliente</text>
+<text x="251" y="109" text-anchor="middle" font-size="12" fill="#534AB7">.json</text>
+<text x="251" y="124" text-anchor="middle" font-size="12" fill="#534AB7">75 clientes</text>
+
+<rect x="320" y="72" width="110" height="66" rx="7" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="375" y="94" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">PS_Categoria</text>
+<text x="375" y="109" text-anchor="middle" font-size="12" fill="#534AB7">PS_Meta2025</text>
+<text x="375" y="124" text-anchor="middle" font-size="12" fill="#534AB7">.csv</text>
+
+<rect x="444" y="72" width="192" height="66" rx="7" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="540" y="94" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">PS_Conta_Pagar</text>
+<text x="540" y="109" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">PS_Conta_Receber</text>
+<text x="540" y="124" text-anchor="middle" font-size="12" fill="#534AB7">.xlsx — 3k e 68k linhas</text>
+
+<!-- setas fontes → bronze -->
+<line x1="113" y1="152" x2="113" y2="192" stroke="#7F77DD" stroke-width="1" marker-end="url(#arrow-purple)"/>
+<line x1="251" y1="152" x2="232" y2="192" stroke="#7F77DD" stroke-width="1" marker-end="url(#arrow-purple)"/>
+<line x1="375" y1="152" x2="340" y2="192" stroke="#7F77DD" stroke-width="1" marker-end="url(#arrow-purple)"/>
+<line x1="540" y1="152" x2="460" y2="192" stroke="#7F77DD" stroke-width="1" marker-end="url(#arrow-purple)"/>
+
+<!-- ══ BRONZE ══ -->
+<rect x="30" y="192" width="620" height="130" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="340" y="214" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">Camada Bronze — ingestão raw</text>
+<text x="340" y="230" text-anchor="middle" font-size="12" fill="#854F0B">Dados brutos preservados sem transformação · formato Parquet · logging estruturado</text>
+
+<rect x="44" y="238" width="140" height="72" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="114" y="258" text-anchor="middle" font-size="14" font-weight="500" fill="#633806">bcb_cotacoes</text>
+<text x="114" y="274" text-anchor="middle" font-size="12" fill="#854F0B">moeda · data</text>
+<text x="114" y="289" text-anchor="middle" font-size="12" fill="#854F0B">cotacao_compra/venda</text>
+<text x="114" y="303" text-anchor="middle" font-size="12" fill="#854F0B">.parquet</text>
+
+<rect x="198" y="238" width="116" height="72" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="256" y="258" text-anchor="middle" font-size="14" font-weight="500" fill="#633806">PS_Cliente</text>
+<text x="256" y="274" text-anchor="middle" font-size="12" fill="#854F0B">PS_Categoria</text>
+<text x="256" y="289" text-anchor="middle" font-size="12" fill="#854F0B">PS_Meta2025</text>
+<text x="256" y="303" text-anchor="middle" font-size="12" fill="#854F0B">.parquet</text>
+
+<rect x="328" y="238" width="160" height="72" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="408" y="258" text-anchor="middle" font-size="14" font-weight="500" fill="#633806">PS_Conta_Pagar</text>
+<text x="408" y="274" text-anchor="middle" font-size="14" font-weight="500" fill="#633806">PS_Conta_Receber</text>
+<text x="408" y="289" text-anchor="middle" font-size="12" fill="#854F0B">preservado como recebido</text>
+<text x="408" y="303" text-anchor="middle" font-size="12" fill="#854F0B">.parquet</text>
+
+<rect x="502" y="238" width="134" height="72" rx="7" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+<text x="569" y="258" text-anchor="middle" font-size="14" font-weight="500" fill="#633806">bronze_pipeline</text>
+<text x="569" y="274" text-anchor="middle" font-size="12" fill="#854F0B">file_loader</text>
+<text x="569" y="289" text-anchor="middle" font-size="12" fill="#854F0B">bcb_client</text>
+<text x="569" y="303" text-anchor="middle" font-size="12" fill="#854F0B">src/ingestion/</text>
+
+<!-- seta bronze → silver -->
+<line x1="340" y1="322" x2="340" y2="362" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- ══ SILVER ══ -->
+<rect x="30" y="362" width="620" height="196" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="340" y="384" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">Camada Silver — limpeza e enriquecimento</text>
+<text x="340" y="400" text-anchor="middle" font-size="12" fill="#5F5E5A">Padronização · deduplicação · encoding · datas · join cotações BCB · conversão BRL</text>
+
+<rect x="44" y="408" width="130" height="70" rx="7" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="109" y="428" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">cliente_silver</text>
+<text x="109" y="444" text-anchor="middle" font-size="12" fill="#5F5E5A">fix encoding UTF-8</text>
+<text x="109" y="459" text-anchor="middle" font-size="12" fill="#5F5E5A">normaliz. países</text>
+<text x="109" y="474" text-anchor="middle" font-size="12" fill="#5F5E5A">moeda_pais</text>
+
+<rect x="188" y="408" width="130" height="70" rx="7" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="253" y="428" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">categoria_silver</text>
+<text x="253" y="444" text-anchor="middle" font-size="12" fill="#5F5E5A">remove duplicados</text>
+<text x="253" y="459" text-anchor="middle" font-size="12" fill="#5F5E5A">tipo → minúsculo</text>
+<text x="253" y="474" text-anchor="middle" font-size="12" fill="#5F5E5A">trata nulos</text>
+
+<rect x="332" y="408" width="130" height="70" rx="7" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="397" y="428" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">meta_silver</text>
+<text x="397" y="444" text-anchor="middle" font-size="12" fill="#5F5E5A">parse datas mistas</text>
+<text x="397" y="459" text-anchor="middle" font-size="12" fill="#5F5E5A">"700k" → 700000</text>
+<text x="397" y="474" text-anchor="middle" font-size="12" fill="#5F5E5A">mes/ano extraídos</text>
+
+<rect x="476" y="408" width="160" height="70" rx="7" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="556" y="428" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">conta_receber_silver</text>
+<text x="556" y="444" text-anchor="middle" font-size="12" fill="#5F5E5A">join cotações BCB</text>
+<text x="556" y="459" text-anchor="middle" font-size="12" fill="#5F5E5A">valor → BRL</text>
+<text x="556" y="474" text-anchor="middle" font-size="12" fill="#5F5E5A">join dim_cliente</text>
+
+<rect x="188" y="490" width="130" height="54" rx="7" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="253" y="510" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">conta_pagar_silver</text>
+<text x="253" y="526" text-anchor="middle" font-size="12" fill="#5F5E5A">tipagem · status</text>
+<text x="253" y="540" text-anchor="middle" font-size="12" fill="#5F5E5A">padroniz. datas</text>
+
+<rect x="332" y="490" width="130" height="54" rx="7" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+<text x="397" y="510" text-anchor="middle" font-size="14" font-weight="500" fill="#444441">silver_pipeline</text>
+<text x="397" y="526" text-anchor="middle" font-size="12" fill="#5F5E5A">orquestra todas</text>
+<text x="397" y="540" text-anchor="middle" font-size="12" fill="#5F5E5A">src/transform/</text>
+
+<!-- seta silver → gold -->
+<line x1="340" y1="558" x2="340" y2="598" stroke="#888780" stroke-width="1" marker-end="url(#arrow)"/>
+
+<!-- ══ GOLD ══ -->
+<rect x="30" y="598" width="620" height="270" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="620" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Camada Gold — Star Schema analítico</text>
+<text x="340" y="636" text-anchor="middle" font-size="12" fill="#0F6E56">Surrogate keys · dimensões conformadas · fatos com métricas consolidadas · PostgreSQL</text>
+
+<text x="60" y="656" font-size="11" font-weight="500" fill="#085041">DIMENSÕES</text>
+
+<rect x="44" y="662" width="118" height="66" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="103" y="680" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">dim_cliente</text>
+<text x="103" y="695" text-anchor="middle" font-size="12" fill="#0F6E56">id_cliente</text>
+<text x="103" y="709" text-anchor="middle" font-size="12" fill="#0F6E56">nome · pais</text>
+<text x="103" y="723" text-anchor="middle" font-size="12" fill="#0F6E56">moeda_pais</text>
+
+<rect x="174" y="662" width="118" height="66" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="233" y="680" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">dim_categoria</text>
+<text x="233" y="695" text-anchor="middle" font-size="12" fill="#0F6E56">sk_categoria</text>
+<text x="233" y="709" text-anchor="middle" font-size="12" fill="#0F6E56">codigo · nome</text>
+<text x="233" y="723" text-anchor="middle" font-size="12" fill="#0F6E56">tipo_categoria</text>
+
+<rect x="304" y="662" width="118" height="66" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="363" y="680" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">dim_data</text>
+<text x="363" y="695" text-anchor="middle" font-size="12" fill="#0F6E56">sk_data</text>
+<text x="363" y="709" text-anchor="middle" font-size="12" fill="#0F6E56">ano · tri · mes</text>
+<text x="363" y="723" text-anchor="middle" font-size="12" fill="#0F6E56">dia · fim_semana</text>
+
+<rect x="434" y="662" width="118" height="66" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="493" y="680" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">dim_moeda</text>
+<text x="493" y="695" text-anchor="middle" font-size="12" fill="#0F6E56">sk_moeda</text>
+<text x="493" y="709" text-anchor="middle" font-size="12" fill="#0F6E56">codigo_moeda</text>
+<text x="493" y="723" text-anchor="middle" font-size="12" fill="#0F6E56">BRL·USD·EUR···</text>
+
+<text x="60" y="748" font-size="11" font-weight="500" fill="#085041">FATOS</text>
+
+<rect x="44" y="754" width="174" height="98" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="131" y="774" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">fato_conta_receber</text>
+<text x="131" y="790" text-anchor="middle" font-size="12" fill="#0F6E56">68.104 registros</text>
+<text x="131" y="805" text-anchor="middle" font-size="12" fill="#0F6E56">id_cliente · sk_categoria</text>
+<text x="131" y="820" text-anchor="middle" font-size="12" fill="#0F6E56">sk_moeda · sk_data</text>
+<text x="131" y="835" text-anchor="middle" font-size="12" fill="#0F6E56">valor_conta · valor_brl</text>
+<text x="131" y="848" text-anchor="middle" font-size="12" fill="#0F6E56">status_conta</text>
+
+<rect x="234" y="754" width="174" height="98" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="321" y="774" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">fato_conta_pagar</text>
+<text x="321" y="790" text-anchor="middle" font-size="12" fill="#0F6E56">3.166 registros</text>
+<text x="321" y="805" text-anchor="middle" font-size="12" fill="#0F6E56">sk_categoria · sk_moeda</text>
+<text x="321" y="820" text-anchor="middle" font-size="12" fill="#0F6E56">sk_data_pagamento</text>
+<text x="321" y="835" text-anchor="middle" font-size="12" fill="#0F6E56">valor_conta · valor_brl</text>
+<text x="321" y="848" text-anchor="middle" font-size="12" fill="#0F6E56">destino_pagamento</text>
+
+<rect x="424" y="754" width="212" height="98" rx="7" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="530" y="774" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">fato_meta_mensal</text>
+<text x="530" y="790" text-anchor="middle" font-size="12" fill="#0F6E56">12 registros (1 por mês)</text>
+<text x="530" y="805" text-anchor="middle" font-size="12" fill="#0F6E56">sk_fato_meta</text>
+<text x="530" y="820" text-anchor="middle" font-size="12" fill="#0F6E56">sk_data_referencia</text>
+<text x="530" y="835" text-anchor="middle" font-size="12" fill="#0F6E56">meta_valor · mes · ano</text>
+<text x="530" y="848" text-anchor="middle" font-size="12" fill="#0F6E56">nome_mes</text>
+
+<!-- FKs dim → fato -->
+<line x1="103" y1="728" x2="103" y2="754" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arrow-teal)"/>
+<line x1="233" y1="728" x2="233" y2="754" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arrow-teal)"/>
+<line x1="321" y1="728" x2="321" y2="754" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arrow-teal)"/>
+<line x1="363" y1="728" x2="363" y2="754" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arrow-teal)"/>
+<line x1="493" y1="728" x2="493" y2="754" stroke="#1D9E75" stroke-width="0.8" stroke-dasharray="4 3" marker-end="url(#arrow-teal)"/>
+
+<!-- seta gold → postgres -->
+<line x1="340" y1="868" x2="340" y2="908" stroke="#0F6E56" stroke-width="1" marker-end="url(#arrow-teal)"/>
+
+<!-- ══ POSTGRES ══ -->
+<rect x="120" y="908" width="440" height="64" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+<text x="340" y="932" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">PostgreSQL — schema gold</text>
+<text x="340" y="950" text-anchor="middle" font-size="12" fill="#0F6E56">SQLAlchemy · upsert controlado · índices nas FKs · star_schema.py + postgres_loader.py</text>
+
+<!-- seta postgres → airflow -->
+<line x1="340" y1="972" x2="340" y2="1008" stroke="#7F77DD" stroke-width="1" marker-end="url(#arrow-purple)"/>
+
+<!-- ══ AIRFLOW ══ -->
+<rect x="120" y="1008" width="440" height="54" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+<text x="340" y="1030" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">Apache Airflow — orquestração (diferencial)</text>
+<text x="340" y="1048" text-anchor="middle" font-size="12" fill="#534AB7">DAG diária · Bronze → Silver → Gold · dags/desafio_ray_pipeline_dag.py</text>
+
+</svg>
